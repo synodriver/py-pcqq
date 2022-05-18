@@ -55,12 +55,7 @@ async def plugin_handle(body):
             break
 
 async def event_handle(cmd:str, sequence:bytes, body:bytes):
-    await cli.write_packet(
-        cmd,
-        const.BODY_VERSION,
-        body[0:16],
-        sequence=sequence
-    )   # 初步进行回执
+    await cli.write_packet(cmd, const.BODY_VERSION, body[:16], sequence=sequence)
 
     if cmd == "03 52":
         """私聊图片上传响应"""

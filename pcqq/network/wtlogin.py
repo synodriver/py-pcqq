@@ -104,7 +104,7 @@ async def fetch_qrcode():
     path = os.path.join(os.getcwd(), 'QrCode.jpg')
     with open(path, mode="wb") as f:
         f.write(reader.read(reader.read_int16()))
-        logger.info('登录二维码获取成功，已保存至' + path)
+        logger.info(f'登录二维码获取成功，已保存至{path}')
 
     system = platform.system()
     try:
@@ -135,11 +135,12 @@ async def check_qrcode():
     tea = binary.QQTea(cli.pckey_for_0819)
     await cli.write_packet(
         "08 19",
-        const.STRUCT_VERSION + "00 30 00 3A",
-        len(cli.token_0038_from_0818).to_bytes(2, 'big') +
-        cli.token_0038_from_0818 +
-        tea.encrypt(writer.clear())
+        f"{const.STRUCT_VERSION}00 30 00 3A",
+        len(cli.token_0038_from_0818).to_bytes(2, 'big')
+        + cli.token_0038_from_0818
+        + tea.encrypt(writer.clear()),
     )
+
 
     _, _, uin, body = await cli.read_packet()
     reader = binary.Reader(tea.decrypt(body))
@@ -203,13 +204,14 @@ async def check_login():
     tea = binary.QQTea(bytes.fromhex(const.SHAREKEY))
     await cli.write_packet(
         "08 36",
-        const.STRUCT_VERSION + "00 01 01 02",
-        len(bytes.fromhex(const.PUBLICKEY)).to_bytes(2, 'big') +
-        bytes.fromhex(const.PUBLICKEY) +
-        bytes.fromhex("00 00 00 10") +
-        bytes.fromhex(const.RANDKEY) +
-        tea.encrypt(writer.clear())
+        f"{const.STRUCT_VERSION}00 01 01 02",
+        len(bytes.fromhex(const.PUBLICKEY)).to_bytes(2, 'big')
+        + bytes.fromhex(const.PUBLICKEY)
+        + bytes.fromhex("00 00 00 10")
+        + bytes.fromhex(const.RANDKEY)
+        + tea.encrypt(writer.clear()),
     )
+
 
     try:
         _, _, _, body = await cli.read_packet()
@@ -294,10 +296,10 @@ async def fetch_session():
     tea = binary.QQTea(cli.pckey_for_0828_send)
     await cli.write_packet(
         "08 28",
-        const.BODY_VERSION + "00 30 00 3A 00 38",
-        cli.token_0038_from_0836 +
-        tea.encrypt(writer.clear())
+        f"{const.BODY_VERSION}00 30 00 3A 00 38",
+        cli.token_0038_from_0836 + tea.encrypt(writer.clear()),
     )
+
 
     _, _, _, body = await cli.read_packet()
     tea.key = cli.pckey_for_0828_recv

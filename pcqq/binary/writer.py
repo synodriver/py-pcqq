@@ -5,7 +5,7 @@ def varint(num: int) -> bytes:
     val = bytearray()
     while num > 127:
         val.append(0x80 | num & 0x7F)
-        num = num >> 7
+        num >>= 7
     val.append(num)
     return bytes(val)
 

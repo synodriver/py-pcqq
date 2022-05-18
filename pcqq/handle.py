@@ -73,13 +73,21 @@ async def group_msg_handle(session, body: bytes):
     await msg_handle(session, reader)
 
     if session.user_id != session.self_id:
-        logger.info(f"收到群聊 %s(%d) 消息 %s(%d): %s" % (
-            await net.get_group_cache(session.group_id),
-            session.group_id,
-            await net.get_user_cache(session.user_id, session.group_id),
-            session.user_id,
-            session.message
-        ))
+        logger.info(
+            (
+                "收到群聊 %s(%d) 消息 %s(%d): %s"
+                % (
+                    await net.get_group_cache(session.group_id),
+                    session.group_id,
+                    await net.get_user_cache(
+                        session.user_id, session.group_id
+                    ),
+                    session.user_id,
+                    session.message,
+                )
+            )
+        )
+
     await net.group_receipt(session.group_id, session.msg_id)
 
 
@@ -100,10 +108,17 @@ async def friend_msg_handle(session, body: bytes):
     reader.read(6 + 4 + 9)
     await msg_handle(session, reader)
 
-    logger.info(f"收到好友消息 %s(%d): %s" % (
-        await net.get_user_cache(session.user_id),
-        session.user_id, session.message
-    ))
+    logger.info(
+        (
+            "收到好友消息 %s(%d): %s"
+            % (
+                await net.get_user_cache(session.user_id),
+                session.user_id,
+                session.message,
+            )
+        )
+    )
+
     await net.friend_receipt(session.user_id, session.timestamp)
 
 
@@ -231,30 +246,28 @@ async def shutup_handle(session, reader: binary.Reader):
                     session.group_id
                 ), session.target_id,
             ))
+    elif time:
+        logger.info("收到群 %s(%d) 事件: %s(%d) 开启了全体禁言" % (
+            await net.get_group_cache(session.group_id), session.group_id,
+
+            await net.get_user_cache(
+                session.user_id,
+                session.group_id
+            ), session.user_id,
+        ))
     else:
-        if time:
-            logger.info("收到群 %s(%d) 事件: %s(%d) 开启了全体禁言" % (
-                await net.get_group_cache(session.group_id), session.group_id,
+        logger.info("收到群 %s(%d) 事件: %s(%d) 解除了全体禁言" % (
+            await net.get_group_cache(session.group_id), session.group_id,
 
-                await net.get_user_cache(
-                    session.user_id,
-                    session.group_id
-                ), session.user_id,
-            ))
-        else:
-            logger.info("收到群 %s(%d) 事件: %s(%d) 解除了全体禁言" % (
-                await net.get_group_cache(session.group_id), session.group_id,
-
-                await net.get_user_cache(
-                    session.user_id,
-                    session.group_id
-                ), session.user_id,
-            ))
+            await net.get_user_cache(
+                session.user_id,
+                session.group_id
+            ), session.user_id,
+        ))
 
 
 async def anonymous_handle(session, reader: binary.Reader):
     session.event_type = "group_anonymous"
-    pass
 
 
 async def other_handle(session, body: bytes):

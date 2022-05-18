@@ -23,7 +23,7 @@ def make_qrtex(QR_Tab):
     back = 0
     color_none = "\x1B[%d;%d;%dm" % (atrr, fore, back)
 
-    for loop in range(0, len(QR_Tab)):
+    for loop in range(len(QR_Tab)):
         if QR_Tab[loop] == '■':
             tmp_text = "%s  \x1B[0m" % (color_block)
         elif QR_Tab[loop] == '□':

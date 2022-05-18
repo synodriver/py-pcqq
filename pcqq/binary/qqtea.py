@@ -11,7 +11,7 @@ class QQTea:
         vl = len(src)
         filln = (8 - (vl + 2)) % 8 + 2
         fills = b''
-        for i in range(filln):
+        for _ in range(filln):
             fills = fills + bytes([220])
         src = (bytes([(filln - 2) | FILL_N_OR])
                + fills
@@ -33,7 +33,7 @@ class QQTea:
         prePlain = decipher(src, self.key)
         pos = (prePlain[0] & 0x07) + 2
         r = prePlain
-        preCrypt = src[0:8]
+        preCrypt = src[:8]
         for i in range(8, l, 8):
             x = xor(decipher(xor(src[i:i + 8], prePlain), self.key), preCrypt)
             prePlain = xor(x, preCrypt)
@@ -46,8 +46,8 @@ class QQTea:
 
 def xor(a, b) -> bytes:
     op = 0xffffffff
-    a1, a2 = struct.unpack(b'>LL', a[0:8])
-    b1, b2 = struct.unpack(b'>LL', b[0:8])
+    a1, a2 = struct.unpack(b'>LL', a[:8])
+    b1, b2 = struct.unpack(b'>LL', b[:8])
     return struct.pack(b'>LL', (a1 ^ b1) & op, (a2 ^ b2) & op)
 
 
@@ -55,8 +55,8 @@ def code(v, k) -> bytes:
     n = 16
     op = 0xffffffff
     delta = 0x9e3779b9
-    k = struct.unpack(b'>LLLL', k[0:16])
-    y, z = struct.unpack(b'>LL', v[0:8])
+    k = struct.unpack(b'>LLLL', k[:16])
+    y, z = struct.unpack(b'>LL', v[:8])
     s = 0
     for _ in range(n):
         s += delta
@@ -71,8 +71,8 @@ def code(v, k) -> bytes:
 def decipher(v, k):
     n = 16
     op = 0xffffffff
-    y, z = struct.unpack(b'>LL', v[0:8])
-    a, b, c, d = struct.unpack(b'>LLLL', k[0:16])
+    y, z = struct.unpack(b'>LL', v[:8])
+    a, b, c, d = struct.unpack(b'>LLLL', k[:16])
     delta = 0x9E3779B9
     s = (delta << 4) & op
     for _ in range(n):

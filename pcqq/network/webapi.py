@@ -183,18 +183,17 @@ async def get_user_cache(user_id: int, group_id: int = 0) -> tuple:
     """
     在缓存内取用户昵称
     """
-    if group_id:
-        ret = cli.cache.select(
-            table_name="gmember",
-            user_id=user_id,
-            group_id=group_id
-        )
-        if not ret:
-            write_ginfo(await get_group_info(group_id))
-            return await get_user_cache(user_id, group_id)
-        return ret[0][0]
-    else:
+    if not group_id:
         return await get_user_name(user_id)
+    ret = cli.cache.select(
+        table_name="gmember",
+        user_id=user_id,
+        group_id=group_id
+    )
+    if not ret:
+        write_ginfo(await get_group_info(group_id))
+        return await get_user_cache(user_id, group_id)
+    return ret[0][0]
 
 
 async def get_group_cache(group_id: int) -> str:

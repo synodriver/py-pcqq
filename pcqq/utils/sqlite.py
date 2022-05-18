@@ -24,9 +24,7 @@ class SqliteDB:
     def insert(self, table_name: str, *args):
         '''调用本方法后需手动调用commit方法'''
         args = [f"'{arg}'" if isinstance(arg, str) else str(arg) for arg in args]
-        self.execute("insert into %s values (%s)" % (
-            table_name, ", ".join(args)
-        ))
+        self.execute(f'insert into {table_name} values ({", ".join(args)})')
 
     def select(self, table_name: str, **params) -> list:
         self.execute("select * from %s where %s" % (
@@ -41,20 +39,19 @@ class SqliteDB:
     def update(self, table_name: str, *args, **params):
         args = " ".join(args)
         params = " ".join([f"{key}={params[key]}" for key in params])
-        self.execute("update %s set %s where %s" % (
-            table_name, args, params
-        ))
+        self.execute(f"update {table_name} set {args} where {params}")
         self.commit()
 
     def delete(self, table_name: str, **params):
-        self.execute("select * from %s where %s" % (
-            table_name, " ".join([f"{key}={params[key]}" for key in params])
-        ))
+        self.execute(
+            f'select * from {table_name} where {" ".join([f"{key}={params[key]}" for key in params])}'
+        )
+
         self.commit()
 
     def count(self, table_name: str) -> int:
         try:
-            self.execute("select count(*) from %s" % (table_name))
+            self.execute(f"select count(*) from {table_name}")
             return self.fetchone()[0]
         except sqlite3.OperationalError:
             return -1

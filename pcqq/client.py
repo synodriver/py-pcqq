@@ -91,35 +91,32 @@ class QQStruct:
     token_0088_from_0836: bytes = b''
 
     def save_token(self, path: str):
-        file = open(path, mode='wb')
+        with open(path, mode='wb') as file:
+            file.write(b'DawnNights'.join([
+                self.server_ip,
+                self.uin.to_bytes(4, 'big'),
+                self.nickname.encode(),
+                self.token_0038_from_0836,
+                self.token_0088_from_0836,
+                self.pckey_for_0828_send,
+                self.pckey_for_0828_recv
+            ]))
 
-        file.write(b'DawnNights'.join([
-            self.server_ip,
-            self.uin.to_bytes(4, 'big'),
-            self.nickname.encode(),
-            self.token_0038_from_0836,
-            self.token_0088_from_0836,
-            self.pckey_for_0828_send,
-            self.pckey_for_0828_recv
-        ]))
-
-        logger.info(f'已保存登录Token至文件 {path}')
-        file.close()
+            logger.info(f'已保存登录Token至文件 {path}')
 
     def load_token(self, path: str):
-        file = open(path, mode='rb')
-        tokens = file.read().split(b'DawnNights')
+        with open(path, mode='rb') as file:
+            tokens = file.read().split(b'DawnNights')
 
-        self.pckey_for_0828_recv = tokens.pop()
-        self.pckey_for_0828_send = tokens.pop()
-        self.token_0088_from_0836 = tokens.pop()
-        self.token_0038_from_0836 = tokens.pop()
-        self.nickname = tokens.pop().decode()
-        self.uin = int.from_bytes(tokens.pop(), 'big')
-        self.server_ip = tokens.pop()
+            self.pckey_for_0828_recv = tokens.pop()
+            self.pckey_for_0828_send = tokens.pop()
+            self.token_0088_from_0836 = tokens.pop()
+            self.token_0038_from_0836 = tokens.pop()
+            self.nickname = tokens.pop().decode()
+            self.uin = int.from_bytes(tokens.pop(), 'big')
+            self.server_ip = tokens.pop()
 
-        logger.info(f'尝试通过 {path} 进行重连...')
-        file.close()
+            logger.info(f'尝试通过 {path} 进行重连...')
 
 
 class HttpResponse:
@@ -232,7 +229,7 @@ class QQClient(QQStruct):
             )
 
         params = parse.urlencode(params)
-        url = url + "?" + params if params else url
+        url = f"{url}?{params}" if params else url
         request = f"GET {url} HTTP/1.1\r\n"
 
         headers["Host"] = ret.netloc

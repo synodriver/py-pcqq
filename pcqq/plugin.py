@@ -128,10 +128,7 @@ def on_keyword(key, *rules, **params):
 
 def on_keywords(key_group, *rules, **params):
     async def keys_rule(session):
-        for key in key_group:
-            if key in session.message:
-                return True
-        return False
+        return any(key in session.message for key in key_group)
     return on(*rules, keys_rule, **params)
 
 

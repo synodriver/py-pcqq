@@ -127,8 +127,8 @@ async def qqmusic(keyword: str):
         title=info["songname"],
         content=info["singer"][0]["name"],
         url=f"https://y.qq.com/n/yqq/song/{info['songmid']}.html",
-        audio="http://dl.stream.qqmusic.qq.com/" + audio,
-        cover="https://y.qq.com/music/photo_new/" + html[start:end].decode()
+        audio=f"http://dl.stream.qqmusic.qq.com/{audio}",
+        cover=f"https://y.qq.com/music/photo_new/{html[start:end].decode()}",
     )
 
 
@@ -186,7 +186,7 @@ async def image_group(group_id: int, image: Image) -> bytes:
 async def image_friend(user_id: int, image: Image) -> bytes:
     writer = binary.Writer()
     await net.upload_friend_image(user_id, image)
-    
+
     wait_times = 90
     while not image.finish:
         await asyncio.sleep(1)
@@ -196,7 +196,7 @@ async def image_friend(user_id: int, image: Image) -> bytes:
 
     writer.write_hex("B6 E8 AF AD E4 BD 93 E7 AE 80 00 00 06 01 43 02")
     writer.write_hex("00 1B")
-    writer.write((utils.randstr(23) + ".jpg").encode())
+    writer.write(f"{utils.randstr(23)}.jpg".encode())
     writer.write_hex("03 00 04")
     writer.write_int32(image.size)
     writer.write_hex("04")
@@ -224,7 +224,7 @@ async def image_friend(user_id: int, image: Image) -> bytes:
 
     writer.write(size)
     writer.write_byte(ord("e"))
-    writer.write((image.hash.hex().upper()+".jpg").encode())
+    writer.write(f"{image.hash.hex().upper()}.jpg".encode())
     writer.write_byte(ord("x"))
     writer.write(image.picid)
     writer.write_byte(ord("A"))

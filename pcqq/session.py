@@ -53,7 +53,7 @@ class Session:
                     else:
                         del seg["type"]
                         data += msg.music(**seg)
-                        escape += f"[PQ:music,{','.join([k+'='+v for k,v in seg.items()])}]"
+                        escape += f"[PQ:music,{','.join([f'{k}={v}' for k,v in seg.items()])}]"
                 elif seg["type"] == "image":
                     if "data" in seg and isinstance(seg["data"], bytes):
                         image = msg.Image(seg["data"])
@@ -68,9 +68,12 @@ class Session:
                     has_image = True
 
         await net.send_group_msg(group_id, data, has_image)
-        logger.info(f"发送群消息: %s -> %s(%d)" % (
-            escape, await net.get_group_cache(group_id), group_id
-        ))
+        logger.info(
+            (
+                "发送群消息: %s -> %s(%d)"
+                % (escape, await net.get_group_cache(group_id), group_id)
+            )
+        )
 
     async def send_friend_msg(self, user_id, *message):
         data = b""
@@ -95,7 +98,7 @@ class Session:
                     else:
                         del seg["type"]
                         data += msg.music(**seg)
-                        escape += f"[PQ:music,{','.join([k+'='+v for k,v in seg.items()])}]"
+                        escape += f"[PQ:music,{','.join([f'{k}={v}' for k,v in seg.items()])}]"
                 elif seg["type"] == "image":
                     if "data" in seg and isinstance(seg["data"], bytes):
                         image = msg.Image(seg["data"])
@@ -110,6 +113,9 @@ class Session:
                     has_image = True
 
         await net.send_friend_msg(user_id, data, has_image)
-        logger.info(f"发送好友消息: %s -> %s(%d)" % (
-            escape, await net.get_user_cache(user_id), user_id
-        ))
+        logger.info(
+            (
+                "发送好友消息: %s -> %s(%d)"
+                % (escape, await net.get_user_cache(user_id), user_id)
+            )
+        )
